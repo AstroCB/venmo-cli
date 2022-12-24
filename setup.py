@@ -11,7 +11,7 @@ setup(
     version="0.1.0",
     author="Cameron Bernhardt",
     author_email="me@cameronbernhardt.com",
-    license_files=["LICENSE.md"],
+    license_files=["LICENSE.txt"],
     description="A simple CLI for Venmo",
     long_description=long_description,
     long_description_content_type="text/markdown",
