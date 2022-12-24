@@ -16,7 +16,7 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/AstroCB/venmo-cli",
-    py_modules=["venmo"],
+    py_modules=["venmo", "arg_types"],
     install_requires=[requirements],
     entry_points={
         "console_scripts": [
