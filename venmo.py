@@ -1,32 +1,20 @@
 #! /usr/local/bin/python3
 
-import argparse
 import getpass
 import os
 import pickle
-import sys
 
 from venmo_api import Client, PaymentPrivacy
+import click
+
+from arg_types import PaymentPrivacyArg
 
 TOKEN_PATH = "token.pickle"
 
 
 class Venmo:
     def __init__(self):
-        parser = argparse.ArgumentParser(
-            description="Venmo for the command-line",
-        )
-        parser.add_argument("subcommand", help="Subcommand to run")
-
-        args = parser.parse_args(sys.argv[1:2])
-        if not hasattr(self, args.subcommand):
-            print("Unrecognized command")
-            parser.print_help()
-            exit(1)
-
         self.client = self._get_client()
-
-        getattr(self, args.subcommand)()
 
     def _get_client(self):
         if os.path.exists(TOKEN_PATH):
@@ -45,11 +33,6 @@ class Venmo:
 
         return Client(access_token=self.access_token)
 
-    def _get_subargs(parser):
-        # ignore the executable itself and the subcommand
-        # to get the subcommand arguments
-        return parser.parse_args(sys.argv[2:])
-
     def _get_user(self, username):
         user = self.client.user.get_user_by_username(username)
         if user is None:
@@ -58,13 +41,6 @@ class Venmo:
         return user
 
     def logout(self):
-        parser = argparse.ArgumentParser(
-            description="""
-Log out of your current session; your session will never expire unless you log out
-"""
-        )
-        Venmo._get_subargs(parser)  # handle -h even though we don't use any args
-
         if not self.client.log_out(self.access_token):
             print("Failed to log out of Venmo session")
             exit(1)
@@ -72,21 +48,41 @@ Log out of your current session; your session will never expire unless you log o
         os.remove(TOKEN_PATH)
         print("Successfully logged out of Venmo session")
 
-    def request(self):
-        parser = argparse.ArgumentParser(description="Request money from another user")
-        parser.add_argument("-a", "--amount", type=int, required=True)
-        parser.add_argument("-u", "--user", type=str, required=True)
-        parser.add_argument("-m", "--msg", type=str, default="🤖")
-        parser.add_argument(
-            "-p", "--privacy", type=PaymentPrivacy, default=PaymentPrivacy.FRIENDS
-        )
 
-        args = Venmo._get_subargs(parser)
-        user = self._get_user(args.user)
-        self.client.payment.request_money(
-            args.amount, args.msg, target_user=user, privacy_setting=args.privacy
-        )
+@click.group(help="venmo-cli: Venmo for the command-line")
+@click.pass_context
+def cli(ctx):
+    ctx.obj = Venmo()
+
+
+def enum_values(enum):
+    return [case.value for case in enum]
+
+
+@cli.command(help="Requests money from another user")
+@click.option("-a", "--amount", type=float, required=True)
+@click.option("-u", "--username", required=True)
+@click.option("-m", "--msg", default="🤖", show_default=True)
+@click.option(
+    "-p",
+    "--privacy",
+    type=PaymentPrivacyArg(),
+    default=PaymentPrivacy.FRIENDS.value,
+    show_default=True,
+)
+@click.pass_obj
+def request(venmo: Venmo, amount, username, msg, privacy):
+    user = venmo._get_user(username)
+    venmo.client.payment.request_money(
+        amount, msg, target_user=user, privacy_setting=privacy
+    )
+
+
+@cli.command(help="Logs out of your current session")
+@click.pass_obj
+def logout(venmo: Venmo):
+    venmo.logout()
 
 
 if __name__ == "__main__":
-    Venmo()
+    cli()
