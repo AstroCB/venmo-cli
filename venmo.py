@@ -79,6 +79,10 @@ def payment_command(f):
     return process_args
 
 
+def to_currency(amount):
+    return "{:,}".format(amount)
+
+
 @cli.command(name="request", help="Requests money from another user")
 @payment_command
 def request(venmo: Venmo, username, amount, msg, privacy):
@@ -86,7 +90,7 @@ def request(venmo: Venmo, username, amount, msg, privacy):
     venmo.client.payment.request_money(
         amount, msg, target_user=user, privacy_setting=privacy
     )
-    print(f"Requested $#{amount} from @#{username} with message '#{msg}'")
+    print(f"Requested ${to_currency(amount)} from @{username} with message '{msg}'")
 
 
 @cli.command(name="pay", help="Sends money to another user")
@@ -96,7 +100,7 @@ def pay(venmo: Venmo, username, amount, msg, privacy):
     venmo.client.payment.send_money(
         amount, msg, target_user=user, privacy_setting=privacy
     )
-    print(f"Paid $#{amount} to @#{username} with message '#{msg}'")
+    print(f"Paid ${to_currency(amount)} to @{username} with message '{msg}'")
 
 
 @cli.command(help="Logs out of your current session")
