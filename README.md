@@ -1,6 +1,14 @@
 # venmo-cli
 venmo-cli is a simple CLI for Venmo, built on the [Venmo API](https://github.com/mmohades/Venmo) by mmohades. As with his API, use this tool _at your own risk_ as it is **not** sponsored/maintained by PayPal or Venmo.
 
+## Installation
+
+Install with pip:
+
+```
+pip install venmo-cli
+```
+
 ## Sample usage
 
 ```
