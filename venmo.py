@@ -12,9 +12,9 @@ from arg_types import PaymentPrivacyArg
 # Follow XDG spec for storing data:
 # https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
 XDG_BASE_DIR = os.environ.get("XDG_STATE_HOME")
-FALLBACK_BASE_DIR = f"{os.environ['HOME']}/.local/state"
+FALLBACK_BASE_DIR = os.path.join(os.environ["HOME"], ".local", "state")
 BASE_DIR = XDG_BASE_DIR if XDG_BASE_DIR is not None else FALLBACK_BASE_DIR
-TOKEN_PATH = f"{BASE_DIR}/venmo-cli/token.pickle"
+TOKEN_PATH = os.path.join(BASE_DIR, "venmo-cli", "token.pickle")
 
 
 class Venmo:
