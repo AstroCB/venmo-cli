@@ -59,21 +59,40 @@ def enum_values(enum):
     return [case.value for case in enum]
 
 
-@cli.command(help="Requests money from another user")
-@click.option("-a", "--amount", type=float, required=True)
-@click.option("-u", "--username", required=True)
-@click.option("-m", "--msg", default="🤖", show_default=True)
-@click.option(
-    "-p",
-    "--privacy",
-    type=PaymentPrivacyArg(),
-    default=PaymentPrivacy.FRIENDS.value,
-    show_default=True,
-)
-@click.pass_obj
-def request(venmo: Venmo, amount, username, msg, privacy):
+# Decorator for commands that process money (request/pay)
+# with common args used for both
+def payment_command(f):
+    @click.argument("username")
+    @click.option("-a", "--amount", type=float, required=True)
+    @click.option("-m", "--msg", default="🤖", show_default=True)
+    @click.option(
+        "-p",
+        "--privacy",
+        type=PaymentPrivacyArg(),
+        default=PaymentPrivacy.FRIENDS.value,
+        show_default=True,
+    )
+    @click.pass_obj
+    def process_args(venmo, username, amount, msg, privacy):
+        f(venmo, username, amount, msg, privacy)
+
+    return process_args
+
+
+@cli.command(name="request", help="Requests money from another user")
+@payment_command
+def request(venmo: Venmo, username, amount, msg, privacy):
     user = venmo._get_user(username)
     venmo.client.payment.request_money(
+        amount, msg, target_user=user, privacy_setting=privacy
+    )
+
+
+@cli.command(name="pay", help="Sends money to another user")
+@payment_command
+def pay(venmo: Venmo, username, amount, msg, privacy):
+    user = venmo._get_user(username)
+    venmo.client.payment.send_money(
         amount, msg, target_user=user, privacy_setting=privacy
     )
 
