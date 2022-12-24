@@ -7,7 +7,7 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
 
 
 setup(
-    name="venmo",
+    name="venmo-cli",
     version="0.1.0",
     author="Cameron Bernhardt",
     author_email="me@cameronbernhardt.com",
