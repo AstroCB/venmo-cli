@@ -31,10 +31,12 @@ Options:
   --help                         Show this message and exit.
 ```
 
-```bash
+```
 $ venmo pay cameronbernhardt -a 5 -m "thanks for the pizza" --privacy=private
+Paid $5 to @cameronbernhardt with message 'thanks for the pizza'
 ```
 
-```bash
+```
 $ venmo request cameronbernhardt -a 10 -m "lunch"
+Requested $10 from @cameronbernhardt with message 'lunch'
 ```

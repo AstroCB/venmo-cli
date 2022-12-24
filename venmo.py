@@ -86,6 +86,7 @@ def request(venmo: Venmo, username, amount, msg, privacy):
     venmo.client.payment.request_money(
         amount, msg, target_user=user, privacy_setting=privacy
     )
+    print(f"Requested $#{amount} from @#{username} with message '#{msg}'")
 
 
 @cli.command(name="pay", help="Sends money to another user")
@@ -95,6 +96,7 @@ def pay(venmo: Venmo, username, amount, msg, privacy):
     venmo.client.payment.send_money(
         amount, msg, target_user=user, privacy_setting=privacy
     )
+    print(f"Paid $#{amount} to @#{username} with message '#{msg}'")
 
 
 @cli.command(help="Logs out of your current session")
